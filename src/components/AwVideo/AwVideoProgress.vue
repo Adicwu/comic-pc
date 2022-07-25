@@ -10,7 +10,7 @@
     @touchstart="progressing"
   >
     <div class="aw-video__progress-tooltip" :style="tooltipStyle">
-      <div class="preview">
+      <div class="preview" :style="previewStyle">
         <img v-if="previewImg" :src="previewImg" />
         <span>{{ sToMs(tooltipTime) }}</span>
       </div>
@@ -39,7 +39,7 @@ import {
   ref,
   watch
 } from 'vue'
-import { sToMs } from 'adicw-utils'
+import { numLimit, sToMs } from 'adicw-utils'
 import { onWindowSizeChange } from '@/utils/vant/useWindowSize'
 import AwSlider from '@/components/AwSlider/AwSlider.vue'
 export default defineComponent({
@@ -66,10 +66,10 @@ export default defineComponent({
     }
   },
   emits: {
-    timeChange: (e: number) => e,
-    timePreview: (e: number) => e,
+    timeChange: (e: number) => typeof e === 'number',
+    timePreview: (e: number) => typeof e === 'number',
     /** 继承于AwSlider组件 */
-    change: (e: number) => e,
+    change: (e: number) => typeof e === 'number',
     progressing: null,
     progressend: null
   },
@@ -84,12 +84,14 @@ export default defineComponent({
       x: 0
     })
     const sliderVal = ref(0)
+
     const hasCurListenlist = computed(() => true)
-    const tooltipStyle = computed(() => {
-      return {
-        transform: `translateX(${mouse.x}px)`
-      } as CSSProperties
-    })
+    const tooltipStyle = computed<CSSProperties>(() => ({
+      transform: `translateX(${mouse.x}px)`
+    }))
+    const previewStyle = computed<CSSProperties>(() => ({
+      transform: `translateX(-${mouse.x / self.width < 0.9 ? 0 : 80}%)`
+    }))
     const tooltipTime = computed(() => {
       const { duration } = props
       const time = (mouse.x / self.width) * duration
@@ -117,7 +119,7 @@ export default defineComponent({
           break
         }
       }
-      mouse.x = x - self.offsetX
+      mouse.x = numLimit(x - self.offsetX, 0, self.width)
       emit('timePreview', tooltipTime.value)
     }
     const initStyle = async () => {
@@ -150,6 +152,7 @@ export default defineComponent({
       changProgress,
       sToMs,
       hasCurListenlist,
+      previewStyle,
       progressing,
       progressend,
       bufferedListPercent,
@@ -181,22 +184,18 @@ export default defineComponent({
     position: absolute;
     bottom: 26px;
     left: -20px;
-    padding: 0 8px;
-    background: rgb(0 0 0 / 0.8);
-    display: flex;
-    justify-content: center;
-    align-items: center;
     color: #fff;
-    border-radius: 8px;
     opacity: 0;
     transition: opacity 0.25s;
 
     .preview {
       position: relative;
       width: 140px;
+      transition: all 0.25s;
       img {
         width: 100%;
         object-fit: cover;
+        border-radius: 6px;
       }
       span {
         position: absolute;

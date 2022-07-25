@@ -162,9 +162,11 @@
     </div>
     <AwVideoMsg ref="awVideoMsgComp" />
     <VideoRender
+      v-if="src"
       ref="videoInstance"
       :key="src"
       v-model:volume="player.volume"
+      fake-video
       :src="src"
       @initStart="videoInits.start"
       @initSuccessed="videoInits.successed"
@@ -448,7 +450,9 @@ export default defineComponent({
      * @param val ms
      */
     const computedPreview = debounce(async (val: number) => {
-      player.preview = await getVideoScreenshot(props.src, val)
+      const el = videoInstance.value?.fakeVideoEl
+      if (!el) return
+      player.preview = await getVideoScreenshot(el, val)
     }, 100)
 
     const play = () => {
