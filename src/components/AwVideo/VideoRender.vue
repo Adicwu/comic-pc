@@ -2,6 +2,7 @@
   <!-- 大坑：由于videojs会在video标签上套一层节点，导致裸video标签时vue无法正常卸载节点 -->
   <div class="video-render">
     <video ref="videoEl" :style="videoStyle" v-bind="$attrs" />
+    <video ref="fakeVideoEl" class="fake"></video>
   </div>
 </template>
 
@@ -34,6 +35,10 @@ export default defineComponent({
     volume: {
       type: Number,
       default: 0
+    },
+    fakeVideo: {
+      type: Boolean,
+      default: false
     }
   },
   emits: {
@@ -57,7 +62,9 @@ export default defineComponent({
   setup(props, { emit }) {
     const isDev = useIsDev().get()
     const videoInstance = ref<Type.FlvInstance>(null)
+    const fakeVideoInstance = ref<Type.FlvInstance>(null)
     const videoEl = ref<HTMLVideoElement>()
+    const fakeVideoEl = ref<HTMLVideoElement>()
 
     const videoStyle = computed(
       () =>
@@ -99,7 +106,7 @@ export default defineComponent({
       }
     }
     /**
-     * 初始化
+     * 初始化video
      * @param el 视频节点
      * @param url 视频地址
      */
@@ -125,6 +132,16 @@ export default defineComponent({
         return null
       }
     }
+    /**
+     * 初始化video副本
+     */
+    const fakeVideoInit = () => {
+      if (!props.fakeVideo || !props.src) return
+      fakeVideoInstance.value = videojs(fakeVideoEl.value!, {
+        controls: false,
+        sources: [videoUrlToSource(props.src)]
+      })
+    }
 
     /** 修改音量 */
     const setVolume = (volume: number) =>
@@ -140,7 +157,10 @@ export default defineComponent({
     /** 暂停 */
     const pause = () => videoInstance.value?.pause()
     /** 销毁(此方法会删除video节点 暂时不用) */
-    const destroy = () => videoInstance.value?.dispose()
+    const destroy = () => {
+      videoInstance.value?.dispose()
+      fakeVideoInstance.value?.dispose()
+    }
 
     /** 监听 */
     ;(() => {
@@ -182,6 +202,7 @@ export default defineComponent({
 
     onMounted(() => {
       videoInit(videoEl.value!, props.src)
+      fakeVideoInit()
     })
     onBeforeUnmount(() => {
       destroy()
@@ -191,6 +212,7 @@ export default defineComponent({
       videoEl,
       videoInstance,
       videoStyle,
+      fakeVideoEl,
       play,
       pause,
       destroy,
@@ -216,6 +238,9 @@ export default defineComponent({
     button {
       display: none !important;
     }
+  }
+  .fake {
+    display: none;
   }
 }
 </style>
