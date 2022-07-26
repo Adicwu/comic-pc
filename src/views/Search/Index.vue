@@ -350,7 +350,7 @@ export default defineComponent({
       position: relative;
       flex: 1;
       border-top-left-radius: var(--df-radius);
-      overflow-y: scroll;
+      overflow-y: overlay;
 
       &__content {
         display: grid;

@@ -83,7 +83,7 @@ export default defineComponent({
   width: 100%;
   height: 100%;
   border-top-left-radius: 30px;
-  overflow-y: auto;
+  overflow-y: overlay;
   background: var(--box-bg-color);
 
   .home-main {

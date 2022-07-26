@@ -275,7 +275,7 @@ export default defineComponent({
   background: rgba(0, 0, 0, 0.4);
   z-index: 444;
   border-top-left-radius: var(--df-radius);
-  overflow-y: scroll;
+  overflow-y: overlay;
   &__close {
     position: fixed;
     top: 80px;
