@@ -25,18 +25,20 @@ export default defineComponent({
     }
   },
   setup(props) {
-    const curScroll = ref(0)
+    // const curScroll = ref(0)
     const dom = ref<HTMLElement>()
+    const visible = ref(false)
 
     const curPos = computed<CSSProperties>(() => ({
-      transform: `translateY(${curScroll.value > 400 ? '0' : '-100%'})`
+      transform: `translateY(${visible.value ? '0' : '-100%'})`
     }))
     const hasTarget = computed(() => props.target !== '')
 
     const scroller = (e: Event) => {
       throttle(() => {
         const scTop = (e.target as HTMLElement).scrollTop
-        curScroll.value = scTop
+        // curScroll.value = scTop
+        visible.value = scTop > 400
       }, 100)()
     }
     const addEvent = () => {
