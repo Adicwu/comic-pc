@@ -27,6 +27,7 @@
           </template>
         </el-dropdown>
       </SearchHeader>
+      <PixivRank />
       <AwSearchLoading :pending="state.searchPending">
         <AwVirtualWaterfall
           target=".pixiv-content"
@@ -39,10 +40,10 @@
           <template #item="{ item }">
             <PixivContentItem
               :style="{
-                opacity: state.pixivMainId === item.id ? 0 : 1
+                opacity: pixivMainId === item.id ? 0 : 1
               }"
               :detail="item"
-              @click="(e) => imgPreview(e, item)"
+              @click="(e) => toMain(e, item)"
             />
           </template>
         </AwVirtualWaterfall>
@@ -61,19 +62,19 @@
 
 <script lang="ts" setup>
 import { ComicSearchItem, vilipixSearch } from '@/api'
+import * as ApiReturns from '@/api/api.type'
 import AwSearchLoading from '@/components/AwSearchLoading/AwSearchLoading.vue'
 import { AwVirtualWaterfall, Type } from '@/components/AwVirtualWaterfall'
 import SearchHeader from '@/components/Form/SearchHeader.vue'
 import { toPixivMain } from '@/hooks/router'
 import { ElMessage } from 'element-plus'
-import { reactive, watch } from 'vue'
-import { useRoute } from 'vue-router'
+import { reactive } from 'vue'
 import PixivContentItem from './component/PixivContentItem.vue'
-import * as ApiReturns from '@/api/api.type'
+import PixivRank from './component/PixivRank.vue'
+import { usePixivMainAnmId } from './hooks/usePixivMainAnm'
 import { PIXIV_SEARCH_SORT } from './static/form'
 
-const $route = useRoute()
-
+const { pixivMainId } = usePixivMainAnmId()
 const pixivFilter = reactive({
   name: '',
   sort: 'hot' as ApiReturns.VilipixSearchSort
@@ -112,21 +113,9 @@ const changeSearchSort = (value: ApiReturns.VilipixSearchSort) => {
   pixivFilter.sort = value
   onSearch()
 }
-const imgPreview = (e: Event, item: ComicSearchItem) => {
+const toMain = (e: Event, item: ComicSearchItem) => {
   const el = e.target as HTMLElement
-  const rect = el.getBoundingClientRect()
-
-  toPixivMain(item.id, {
-    detail: item,
-    rect: {
-      width: rect.width | 0,
-      height: rect.height | 0,
-      x: rect.x | 0,
-      y: rect.y | 0,
-      path: item.preurl,
-      radius: getComputedStyle(el).borderRadius
-    }
-  })
+  toPixivMain(el, item)
 }
 const onNoMoreResult = () => {
   ElMessage({
@@ -134,21 +123,6 @@ const onNoMoreResult = () => {
     type: 'info'
   })
 }
-
-watch(
-  () => $route.params,
-  (params) => {
-    const id = String(params.id)
-    if (!params.id) {
-      setTimeout(() => {
-        state.pixivMainId = ''
-      }, 625)
-    }
-    if (state.pixivMainId === '') {
-      state.pixivMainId = id
-    }
-  }
-)
 </script>
 <style lang="less" scoped>
 #pixiv {
@@ -163,7 +137,7 @@ watch(
       position: sticky;
       top: 0;
       padding-top: 10px;
-      margin-bottom: 20px;
+      margin-bottom: 30px;
     }
 
     &-content {

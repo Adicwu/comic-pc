@@ -26,19 +26,19 @@ export function toComicMain(
   })
 }
 
-export interface PixivMainParams {
-  /** 图片信息 */
-  detail: ComicSearchItem
-  /** 进入图片rect */
-  rect: {
-    width: number
-    height: number
-    x: number
-    y: number
-    radius: string
-    path: string
-  }
-}
+// export interface PixivMainParams {
+//   /** 图片信息 */
+//   detail: ComicSearchItem
+//   /** 进入图片rect */
+//   rect: {
+//     width: number
+//     height: number
+//     x: number
+//     y: number
+//     radius: string
+//     path: string
+//   }
+// }
 
 /**
  * 前往Pixiv图片详情
@@ -48,16 +48,24 @@ export interface PixivMainParams {
  * @returns
  */
 export function toPixivMain(
-  id: number | string,
-  params: PixivMainParams,
+  el: HTMLElement,
+  item: ComicSearchItem,
   type: 'push' | 'replace' = 'push'
 ) {
+  const rect = el.getBoundingClientRect()
   return router[type]({
     name: 'PixivMain',
     params: {
-      rect: JSON.stringify(params.rect),
-      detail: JSON.stringify(params.detail),
-      id
+      rect: JSON.stringify({
+        width: rect.width | 0,
+        height: rect.height | 0,
+        x: rect.x | 0,
+        y: rect.y | 0,
+        path: item.preurl,
+        radius: getComputedStyle(el).borderRadius
+      }),
+      detail: JSON.stringify(item),
+      id: item.id
     }
   })
 }
