@@ -12,7 +12,7 @@ const BaseUrl =
  * 获取动漫的相关图片列表-来源pixiv
  * @param param
  */
-export async function getComicImglist({
+export async function vilipixSearch({
   name = '',
   limit = 20,
   offset = 0,
@@ -26,7 +26,7 @@ export async function getComicImglist({
   offset?: number
   sort?: ApiReturns.VilipixSearchSort
   type?: number
-}): Promise<FnReturns.GetComicImglistReturn> {
+} = {}): Promise<FnReturns.VilipixSearch> {
   try {
     const realName = name
       .split(' ')[0]
@@ -46,7 +46,6 @@ export async function getComicImglist({
         orgurl: item.original_url,
         preurl: item.regular_url,
         id: item.picture_id,
-        desc: '',
         w: item.width,
         h: item.height,
         commentTotal: item.comment_total,
@@ -65,13 +64,54 @@ export async function getComicImglist({
 }
 
 /**
- * 获取动漫图片详情，和getComicImglist关联
+ * 获取动漫的相关图片列表-来源pixiv
+ * @param param
+ */
+export async function vilipixRank({
+  limit = 20,
+  offset = 0,
+  type = 0
+}: {
+  limit?: number
+  offset?: number
+  type?: number
+} = {}): Promise<FnReturns.VilipixRank> {
+  try {
+    const { data } = await dfGetax<ApiReturns.VilipixRank>(
+      `https://www.vilipix.com/api/v1/picture/ranking?limit=${limit}&offset=${offset}&type=${type}`
+    )
+    return {
+      list: getVal(() => data.data.rows, []).map((item) => ({
+        date: item.created_at,
+        title: item.title,
+        orgurl: item.original_url,
+        preurl: item.regular_url,
+        id: item.picture_id,
+        w: item.width,
+        h: item.height,
+        commentTotal: item.comment_total,
+        likeTotal: item.like_total,
+        tags: item.tags,
+        total: item.page_total
+      })),
+      total: data?.data?.count || 0
+    }
+  } catch (e) {
+    return {
+      list: [],
+      total: 0
+    }
+  }
+}
+
+/**
+ * 获取动漫图片详情，和vilipixSearch关联
  * todo
  * @param id
  */
-export async function getComicImgMain(
-  id: string | number
-): Promise<FnReturns.GetComicImgMain | null> {
+export async function getVilipixPicMain(
+  id: string
+): Promise<FnReturns.VilipixPicMain | null> {
   try {
     const { data } = await dfGetax<ApiReturns.VilipixIllust>(
       `${BaseUrl}illust/${id}`

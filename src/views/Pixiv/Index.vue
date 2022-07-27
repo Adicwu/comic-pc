@@ -60,7 +60,7 @@
 </template>
 
 <script lang="ts" setup>
-import { ComicSearchItem, getComicImglist } from '@/api'
+import { ComicSearchItem, vilipixSearch } from '@/api'
 import AwSearchLoading from '@/components/AwSearchLoading/AwSearchLoading.vue'
 import { AwVirtualWaterfall, Type } from '@/components/AwVirtualWaterfall'
 import SearchHeader from '@/components/Form/SearchHeader.vue'
@@ -86,7 +86,7 @@ const state = reactive({
 })
 
 const fetchPixiv: Type.RequsetFn = async (tpage, size) => {
-  const { list, total } = await getComicImglist({
+  const { list, total } = await vilipixSearch({
     limit: size,
     offset: --tpage * size,
     name: pixivFilter.name,

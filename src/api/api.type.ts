@@ -225,6 +225,15 @@ export interface VilipixSearch {
   }
 }
 
+export interface VilipixRank {
+  data: {
+    /** 结果 */
+    rows: VilipixSearch['data']['rows'][0][]
+    /** 结果总数 */
+    count: number
+  }
+}
+
 export type VilipixSearchSort = 'hot' | 'new'
 
 export interface VilipixIllust {

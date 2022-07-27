@@ -148,7 +148,7 @@ export interface ComicSearchItem {
   /** 预览图地址 */
   preurl: string
   /** 简介 */
-  desc: string
+  // desc: string
   /** 时间 */
   date: string
   w: number
@@ -159,15 +159,17 @@ export interface ComicSearchItem {
   total: number
 }
 
-/**
- * 动漫的相关图片列表-来源pixiv
- */
-export interface GetComicImglistReturn {
+export interface VilipixSearch {
   list: ComicSearchItem[]
   total: number
 }
 
-export interface GetComicImgMain {
+export interface VilipixRank {
+  list: ComicSearchItem[]
+  total: number
+}
+
+export interface VilipixPicMain {
   orgImgs: string[]
   author: {
     id: string

@@ -58,7 +58,7 @@
 </template>
 
 <script lang="ts">
-import { getComicImgMain } from '@/api'
+import { getVilipixPicMain } from '@/api'
 import { PixivMainParams } from '@/hooks/router'
 import { jsonParse } from 'adicw-utils'
 import {
@@ -195,8 +195,8 @@ export default defineComponent({
   },
   props: {
     id: {
-      type: [Number, String],
-      default: -1
+      type: String,
+      default: ''
     },
     alive: {
       type: Boolean,
@@ -207,7 +207,7 @@ export default defineComponent({
     const $route = useRoute()
     const $router = useRouter()
 
-    const pixivImgMain: Api.GetComicImgMain & {
+    const pixivImgMain: Api.VilipixPicMain & {
       pending: boolean
     } = reactive({
       pending: true,
@@ -232,8 +232,8 @@ export default defineComponent({
     )
 
     const fetchpixivImgMain = async () => {
-      if (props.id === -1) return
-      const data = await getComicImgMain(props.id)
+      if (!props.id) return
+      const data = await getVilipixPicMain(props.id)
       if (!data) return
       pixivImgMain.orgImgs = data.orgImgs
       pixivImgMain.author.name = data.author.name

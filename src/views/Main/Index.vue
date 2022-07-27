@@ -121,7 +121,7 @@ function comicInfoModule(comicId: Ref<ComicId>, init: () => void) {
         }
       })
 
-      Api.getComicImglist({
+      Api.vilipixSearch({
         name: comic.title
       }).then(({ list }) => (comicImglist.value = list))
 
