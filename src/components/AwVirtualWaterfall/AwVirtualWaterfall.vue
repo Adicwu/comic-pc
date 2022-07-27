@@ -52,7 +52,7 @@ const props = withDefaults(
         total: 0,
         list: []
       }),
-    offsetY: 200,
+    offsetY: 300,
     column: 3,
     columnItemCount: 6,
     requestSize: 0
@@ -145,6 +145,17 @@ const columnsQueueList = computed(() =>
 )
 /** 实际视图渲染使用的data */
 const renderedData = computed(() =>
+  // columnsQueueList.value.reduce<
+  //   (Type.ColumnsQueue['list'][0] & { id: string | number })[]
+  // >((totol, item) => {
+  //   if (item.y + item.h > scroll.start && item.y < scroll.end) {
+  //     totol.push({
+  //       id: item.item.id,
+  //       ...item
+  //     })
+  //   }
+  //   return totol
+  // }, [])
   columnsQueueList.value.filter(
     (item) => item.y + item.h > scroll.start && item.y < scroll.end
   )
@@ -161,13 +172,16 @@ const { onIsBindChanged, getTarget } = (() => {
     scrollTop -= scroll.offsetTop
     scroll.start = scrollTop
     if (
+      !hasMoreData.value &&
+      clientHeight + scrollTop > columnsExtremeHeight.value.max * 0.7
+    ) {
+      // console.log('request')
+      await loadMoreData()
+    }
+    if (
       clientHeight + scrollTop + props.offsetY >
       columnsExtremeHeight.value.min
     ) {
-      if (!hasMoreData.value) {
-        // console.log('request')
-        await loadMoreData()
-      }
       addToQueue((props.column / 2) | 0)
     }
   }, 100)
