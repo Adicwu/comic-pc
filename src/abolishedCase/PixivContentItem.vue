@@ -1,5 +1,5 @@
 <template>
-  <div v-if="detail" v-show="loaded" class="pixiv-content__item">
+  <div v-show="loaded" class="pixiv-content__item">
     <img :src="detail.preurl" @load="loaded = true" />
     <div v-if="detail.total > 1" class="total">
       <b>{{ detail.total }}</b>
@@ -9,16 +9,16 @@
 
 <script lang="ts" setup>
 import { ComicSearchItem } from '@/api'
-import { ref } from 'vue'
-withDefaults(
-  defineProps<{
-    detail: ComicSearchItem | null
-  }>(),
-  {
-    detail: null
-  }
-)
+import { onMounted, ref } from 'vue'
+const props = defineProps<{
+  detail: ComicSearchItem
+}>()
 const loaded = ref(false)
+// onMounted(() => {
+//   if (props.detail.id === '44873217') {
+//     console.log('mou', props.detail?.id)
+//   }
+// })
 </script>
 <style lang="less" scoped>
 .pixiv-content__item {
@@ -45,7 +45,7 @@ const loaded = ref(false)
     display: block;
     border-radius: 14px;
     transition: all 0.25s;
-    cursor: pointer;
+    cursor: zoom-in;
     background: #def;
   }
 
