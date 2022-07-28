@@ -19,6 +19,7 @@ import { debounce, throttle } from '@/utils/adLoadsh'
 import {
   computed,
   CSSProperties,
+  markRaw,
   nextTick,
   onMounted,
   onUnmounted,
@@ -226,7 +227,7 @@ const loadMoreData = async () => {
     return
   }
   reList.tpage++
-  reList.data.push(...list.map((item) => Object.freeze(item)))
+  reList.data.push(...markRaw(list))
   reList.total = total
   reList.isPending = false
 }

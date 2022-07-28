@@ -14,7 +14,9 @@ import {
   computed,
   onMounted,
   onBeforeUnmount,
-  watch
+  watch,
+  markRaw,
+  shallowRef
 } from 'vue'
 import videojs from 'video.js'
 
@@ -61,8 +63,8 @@ export default defineComponent({
   },
   setup(props, { emit }) {
     const isDev = useIsDev().get()
-    const videoInstance = ref<Type.FlvInstance>(null)
-    const fakeVideoInstance = ref<Type.FlvInstance>(null)
+    const videoInstance = shallowRef<Type.FlvInstance>(null)
+    const fakeVideoInstance = shallowRef<Type.FlvInstance>(null)
     const videoEl = ref<HTMLVideoElement>()
     const fakeVideoEl = ref<HTMLVideoElement>()
 
@@ -114,12 +116,14 @@ export default defineComponent({
       if (!url || !el) return
       emit('initStart')
       try {
-        videoInstance.value = videojs(el, {
-          autoplay: true,
-          preload: 'auto',
-          controls: false,
-          sources: [videoUrlToSource(url)]
-        })
+        videoInstance.value = markRaw(
+          videojs(el, {
+            autoplay: true,
+            preload: 'auto',
+            controls: false,
+            sources: [videoUrlToSource(url)]
+          })
+        )
         emit('initSuccessed')
         videoInstance.value.on('error', (e) => {
           emit('error', e)
@@ -137,10 +141,12 @@ export default defineComponent({
      */
     const fakeVideoInit = () => {
       if (!props.fakeVideo || !props.src) return
-      fakeVideoInstance.value = videojs(fakeVideoEl.value!, {
-        controls: false,
-        sources: [videoUrlToSource(props.src)]
-      })
+      fakeVideoInstance.value = markRaw(
+        videojs(fakeVideoEl.value!, {
+          controls: false,
+          sources: [videoUrlToSource(props.src)]
+        })
+      )
     }
 
     /** 修改音量 */
