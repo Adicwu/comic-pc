@@ -17,25 +17,27 @@
       <div></div>
       <div class="ranklist">
         <div class="ranklist-content" :style="ranklistContentStyle">
-          <div
-            v-for="(item, index) in ranklist.list"
-            :key="item.id"
-            class="ranklist-item"
-            :class="{ active: ranklist.active === index }"
-            @click="ranklist.active = index"
-          >
-            <div class="cover">
-              <BaseImg
-                :src="item.preurl"
-                :style="{
-                  opacity: pixivMainId === item.id ? 0 : 1
-                }"
-                @click.stop="(e) => toMain(e, item)"
-              />
+          <KeyframeTransition :max="10">
+            <div
+              v-for="(item, index) in ranklist.list"
+              :key="item.id"
+              class="ranklist-item"
+              :class="{ active: ranklist.active === index }"
+              @click="ranklist.active = index"
+            >
+              <div class="cover">
+                <BaseImg
+                  :src="item.preurl"
+                  :style="{
+                    opacity: pixivMainId === item.id ? 0 : 1
+                  }"
+                  @click.stop="(e) => toMain(e, item)"
+                />
+              </div>
+              <p>{{ item.title }}</p>
+              <b v-show="ranklist.active === index">NO.{{ index + 1 }}</b>
             </div>
-            <p>{{ item.title }}</p>
-            <b v-show="ranklist.active === index">NO.{{ index + 1 }}</b>
-          </div>
+          </KeyframeTransition>
         </div>
       </div>
       <div></div>
@@ -50,6 +52,8 @@ import ImgVary from '@/components/Container/ImgVary.vue'
 import { toPixivMain } from '@/hooks/router'
 import { computed, CSSProperties, reactive } from 'vue'
 import { usePixivMainAnmId } from '../hooks/usePixivMainAnm'
+import { BASE_IMG } from '@/common/static'
+import KeyframeTransition from '@/components/Transition/KeyframeTransition.vue'
 
 const today = {
   date: new Date().getDate(),
@@ -72,16 +76,18 @@ const today = {
 
 const { pixivMainId } = usePixivMainAnmId()
 const ranklist = reactive({
+  pending: true,
   list: [] as FnReturns.VilipixRank['list'],
   active: 0,
   get activeImg() {
-    return this.list[this.active]?.orgurl || ''
+    return this.list[this.active]?.orgurl || BASE_IMG
   }
 })
 
 const ranklistContentStyle = computed<CSSProperties>(() => ({
   transform: `translateX(-${(100 / ranklist.list.length) * ranklist.active}%)`
 }))
+
 const toMain = (e: Event, item: FnReturns.ComicSearchItem) => {
   const el = e.target as HTMLElement
   toPixivMain(el, item)
@@ -90,6 +96,7 @@ const toMain = (e: Event, item: FnReturns.ComicSearchItem) => {
 ;(async () => {
   const { list } = await vilipixRank()
   ranklist.list = list
+  ranklist.pending = false
 })()
 </script>
 <style lang="less" scoped>
@@ -181,6 +188,7 @@ const toMain = (e: Event, item: FnReturns.ComicSearchItem) => {
       font-size: 20px;
       color: rgba(255, 255, 255, 0.688);
     }
+
     .ranklist {
       width: 100%;
       height: 100%;
