@@ -38,13 +38,17 @@
           @onNoMoreResult="onNoMoreResult"
         >
           <template #item="{ item }">
-            <PixivContentItem
+            <div
+              class="pixiv-content__item"
               :style="{
                 opacity: pixivMainId === item.id ? 0 : 1
               }"
-              :detail="item"
-              @click="(e) => toMain(e, item)"
-            />
+            >
+              <img :src="item.preurl" @click="(e) => toMain(e, item)" />
+              <div v-if="item.total > 1" class="total">
+                <b>{{ item.total }}</b>
+              </div>
+            </div>
           </template>
         </AwVirtualWaterfall>
       </AwSearchLoading>
@@ -69,7 +73,6 @@ import SearchHeader from '@/components/Form/SearchHeader.vue'
 import { toPixivMain } from '@/hooks/router'
 import { ElMessage } from 'element-plus'
 import { reactive } from 'vue'
-import PixivContentItem from './component/PixivContentItem.vue'
 import PixivRank from './component/PixivRank.vue'
 import { usePixivMainAnmId } from './hooks/usePixivMainAnm'
 import { PIXIV_SEARCH_SORT } from './static/form'
@@ -147,6 +150,57 @@ const onNoMoreResult = () => {
       overflow-x: hidden;
       overflow-y: overlay;
       user-select: none;
+      &__item {
+        position: relative;
+        width: 100%;
+        height: 100%;
+        animation: identifier 0.25s;
+        padding: 12px;
+        box-sizing: border-box;
+        @keyframes identifier {
+          from {
+            opacity: 0;
+            transform: translateY(200px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+
+        img {
+          width: 100%;
+          height: 100%;
+          display: block;
+          border-radius: 14px;
+          transition: all 0.25s;
+          cursor: zoom-in;
+          background: #def;
+        }
+
+        &:hover {
+          img {
+            box-shadow: 0 0 14px rgba(0, 0, 0, 0.1);
+            transform: scale(0.98);
+          }
+        }
+
+        .total {
+          position: absolute;
+          right: 20px;
+          top: 20px;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          width: 34px;
+          height: 34px;
+          background: rgba(0, 0, 0, 0.6);
+          border-radius: 50%;
+          color: rgba(255, 255, 255, 0.9);
+          font-size: 18px;
+          font-variant-numeric: tabular-nums;
+        }
+      }
     }
   }
   .search-sort {
