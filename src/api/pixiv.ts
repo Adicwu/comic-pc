@@ -3,10 +3,8 @@ import * as FnReturns from './type'
 import * as ApiReturns from './api.type'
 import { getVal } from 'adicw-utils'
 
-const BaseUrl =
-  import.meta.env.MODE === 'development'
-    ? 'http://localhost:3001/'
-    : 'http://pixivapi.adicw.cn/'
+// const BaseUrl = 'http://localhost:3001'
+const BaseUrl = 'http://pixivapi.adicw.cn'
 
 /**
  * 获取动漫的相关图片列表-来源pixiv
@@ -106,7 +104,6 @@ export async function vilipixRank({
 
 /**
  * 获取动漫图片详情，和vilipixSearch关联
- * todo
  * @param id
  */
 export async function getVilipixPicMain(
@@ -114,7 +111,7 @@ export async function getVilipixPicMain(
 ): Promise<FnReturns.VilipixPicMain | null> {
   try {
     const { data } = await dfGetax<ApiReturns.VilipixIllust>(
-      `${BaseUrl}illust/${id}`
+      `${BaseUrl}/illust/${id}`
     )
     return {
       orgImgs: data.imgs,
@@ -126,5 +123,18 @@ export async function getVilipixPicMain(
     }
   } catch {
     return null
+  }
+}
+
+/**
+ * 获取首页热门tag
+ * @returns
+ */
+export async function getVilipixHotTags() {
+  try {
+    const { data = [] } = await dfGetax<string[]>(`${BaseUrl}/hot-tags`)
+    return data.slice(0, 10)
+  } catch {
+    return []
   }
 }
