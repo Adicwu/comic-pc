@@ -18,7 +18,7 @@
 <script lang="ts" setup>
 import { ref } from 'vue'
 import TestItem from './TestItem.vue'
-import { AwComponentsAlive } from './AwComponentsAlive'
+import { AwComponentsAlive } from '@/components/AwComponentsAlive'
 const list = ref([{ id: 1 }, { id: 2 }, { id: 3 }])
 </script>
 <style lang="less" scoped>
