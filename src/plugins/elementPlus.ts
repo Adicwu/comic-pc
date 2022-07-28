@@ -1,4 +1,4 @@
-import { App } from 'vue'
+import { Plugin } from 'vue'
 import {
   ElNotification,
   ElCarousel,
@@ -49,11 +49,13 @@ const comps = [
 ]
 
 const plugins = [ElNotification, ElMessage]
-export function elementPlusInit(app: App<Element>) {
-  comps.forEach((comp) => {
-    app.component(comp.name, comp)
-  })
-  plugins.forEach((plugin) => {
-    app.use(plugin)
-  })
+export const elementPlusInit: Plugin = {
+  install(app) {
+    comps.forEach((comp) => {
+      app.component(comp.name, comp)
+    })
+    plugins.forEach((plugin) => {
+      app.use(plugin)
+    })
+  }
 }

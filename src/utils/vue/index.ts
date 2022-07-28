@@ -1,5 +1,7 @@
-import { App, Directive } from 'vue'
+import { App, Plugin } from 'vue'
 import GlobalComp from '@comps/Global/index'
+import { directs } from '@/utils/vue/directs'
+
 /**
  * vue根实例附加初始化
  */
@@ -7,8 +9,10 @@ export default class VueInit {
   private instance: null | App<Element>
   constructor(instance: App<Element>) {
     this.instance = instance
+    this.useDirects()
+    this.useComps()
   }
-  public useDirects(directs: Record<string, Directive>) {
+  public useDirects() {
     for (const [k, v] of Object.entries(directs)) {
       this.instance!.directive(k, v)
     }
@@ -27,6 +31,8 @@ export default class VueInit {
  * @param app 根vue
  * @returns
  */
-export function createVueInit(app: App<Element>) {
-  return new VueInit(app)
+export const createVueInit: Plugin = {
+  install(app) {
+    new VueInit(app)
+  }
 }
