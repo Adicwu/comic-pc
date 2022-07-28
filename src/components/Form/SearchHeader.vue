@@ -20,6 +20,26 @@
         leave-active-class="animate__fadeOutUp"
       >
         <div
+          v-show="state.using && props.hots.length > 0"
+          class="search-input__history"
+        >
+          <div class="title">热门关键词</div>
+          <ul class="list">
+            <li
+              v-for="(item, index) in props.hots"
+              :key="index"
+              @click="changeHistory(item)"
+            >
+              {{ item }}
+            </li>
+          </ul>
+        </div>
+      </transition>
+      <transition
+        enter-active-class="animate__fadeInDown"
+        leave-active-class="animate__fadeOutUp"
+      >
+        <div
           v-show="state.using && props.history.length > 0"
           class="search-input__history"
         >
@@ -61,9 +81,11 @@ const props = withDefaults(
   defineProps<{
     modelValue: string
     history?: History[]
+    hots?: string[]
   }>(),
   {
-    history: () => []
+    history: () => [],
+    hots: () => []
   }
 )
 
@@ -211,6 +233,7 @@ const clearValue = () => {
 
     .list {
       display: flex;
+      flex-wrap: wrap;
       gap: 12px;
       width: 100%;
 
