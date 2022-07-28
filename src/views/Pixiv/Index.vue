@@ -3,6 +3,7 @@
     <div class="pixiv-content">
       <SearchHeader
         v-model="pixivFilter.name"
+        :hots="state.hotTags"
         class="pixiv-header"
         @search="onSearch"
         @clear="onSearch"
@@ -27,7 +28,7 @@
           </template>
         </el-dropdown>
       </SearchHeader>
-      <PixivRank />
+      <PixivRank v-show="state.rankVisible" />
       <AwSearchLoading :pending="state.searchPending">
         <AwVirtualWaterfall
           target=".pixiv-content"
@@ -65,7 +66,7 @@
 </template>
 
 <script lang="ts" setup>
-import { ComicSearchItem, vilipixSearch } from '@/api'
+import { ComicSearchItem, vilipixSearch, getVilipixHotTags } from '@/api'
 import * as ApiReturns from '@/api/api.type'
 import AwSearchLoading from '@/components/AwSearchLoading/AwSearchLoading.vue'
 import { AwVirtualWaterfall, Type } from '@/components/AwVirtualWaterfall'
@@ -86,10 +87,13 @@ const state = reactive({
   pixivMainId: '',
   childRouteActive: false,
   searchPending: false,
-  requestSize: 50
+  requestSize: 50,
+  rankVisible: true,
+  hotTags: [] as string[]
 })
 
 const fetchPixiv: Type.RequsetFn = async (tpage, size) => {
+  state.rankVisible = !pixivFilter.name
   const { list, total } = await vilipixSearch({
     limit: size,
     offset: --tpage * size,
@@ -126,6 +130,10 @@ const onNoMoreResult = () => {
     type: 'info'
   })
 }
+
+;(async () => {
+  state.hotTags = await getVilipixHotTags()
+})()
 </script>
 <style lang="less" scoped>
 #pixiv {
